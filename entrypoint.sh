@@ -4,21 +4,17 @@
 
 DB_MIGRATION_DIR='/opt/pdnsadmin/migrations'
 
-if [ -z ${PDNS_PROTO} ];
- then PDNS_PROTO="http"
-fi
+[ -z ${PDNS_PROTO} ] && PDNS_PROTO="http"
+[ -z ${PDNS_PORT} ] && PDNS_PORT=8081
+[ -z ${PDNS_HOST} ] && PDNS_HOST="127.0.0.1"
+[ -z ${PDNSADMIN_SQLA_DB_PORT} ] && PDNSADMIN_SQLA_DB_PORT=3306
+[ -z ${PDNSADMIN_PORT} ] && PDNSADMIN_PORT=9191
+[ -z ${PDNSADMIN_SECRET_KEY} ] && PDNSADMIN_SECRET_KEY = 'secret'
+[ -z ${PDNSADMIN_SQLA_DB_USER} ] && PDNSADMIN_SQLA_DB_USER = 'powerdns'
+[ -z ${PDNSADMIN_SQLA_DB_PASSWORD} ] && PDNSADMIN_SQLA_DB_PASSWORD = 'secret'
+[ -z ${PDNSADMIN_SQLA_DB_HOST} ] && PDNSADMIN_SQLA_DB_HOST = '127.0.0.1'
+[ -z ${PDNSADMIN_SQLA_DB_NAME} ] && PDNSADMIN_SQLA_DB_NAME = 'powerdns'
 
-if [ -z ${PDNS_PORT} ];
- then PDNS_PORT=8081
-fi
-
-if [ -z ${PDNS_HOST} ];
- then PDNS_HOST="127.0.0.1"
-fi
-
-if [ -z ${$PDNSADMIN_SQLA_DB_PORT} ];
- then $PDNSADMIN_SQLA_DB_PORT=3306
-fi
 
 # Wait for us to be able to connect to MySQL before proceeding
 echo "===> Waiting for $PDNSADMIN_SQLA_DB_HOST MySQL service"
@@ -50,13 +46,13 @@ SAML_SIGN_REQUEST = False
 SAML_LOGOUT = False
 EOF
 
-if [ -z $PDNSADMIN_SECRET_KEY ];then echo "SECRET_KEY = 'We are the world'";else echo "SECRET_KEY = '$PDNSADMIN_SECRET_KEY'";fi >>/opt/pdnsadmin/config.py
-if [ -z $PDNSADMIN_PORT ];then echo "PORT = 9191";else echo "PORT = $PDNSADMIN_PORT";fi >>/opt/pdnsadmin/config.py
-if [ -z $PDNSADMIN_SQLA_DB_USER ];then echo "SQLA_DB_USER = 'pda'";else echo "SQLA_DB_USER = '$PDNSADMIN_SQLA_DB_USER'";fi >>/opt/pdnsadmin/config.py
-if [ -z $PDNSADMIN_SQLA_DB_PASSWORD ];then echo "SQLA_DB_PASSWORD = 'changeme'";else echo "SQLA_DB_PASSWORD = '$PDNSADMIN_SQLA_DB_PASSWORD'";fi >>/opt/pdnsadmin/config.py
-if [ -z $PDNSADMIN_SQLA_DB_HOST ];then echo "SQLA_DB_HOST = '127.0.0.1'";else echo "SQLA_DB_HOST = '$PDNSADMIN_SQLA_DB_HOST'";fi >>/opt/pdnsadmin/config.py
-if [ -z $PDNSADMIN_SQLA_DB_PORT ];then echo "SQLA_DB_PORT = 3306";else echo "SQLA_DB_PORT = $PDNSADMIN_SQLA_DB_PORT";fi >>/opt/pdnsadmin/config.py
-if [ -z $PDNSADMIN_SQLA_DB_NAME ];then echo "SQLA_DB_NAME = 'pda'";else echo "SQLA_DB_NAME = '$PDNSADMIN_SQLA_DB_NAME'";fi >>/opt/pdnsadmin/config.py
+echo "SECRET_KEY = '${PDNSADMIN_SECRET_KEY}'" >>/opt/pdnsadmin/config.py
+echo "PORT = ${PDNSADMIN_PORT}" >>/opt/pdnsadmin/config.py
+echo "SQLA_DB_USER = '${PDNSADMIN_SQLA_DB_USER}'" >>/opt/pdnsadmin/config.py
+echo "SQLA_DB_PASSWORD = '${PDNSADMIN_SQLA_DB_PASSWORD}'" >>/opt/pdnsadmin/config.py
+echo "SQLA_DB_HOST = '${PDNSADMIN_SQLA_DB_HOST}'" >>/opt/pdnsadmin/config.py
+echo "SQLA_DB_PORT = ${PDNSADMIN_SQLA_DB_PORT}" >>/opt/pdnsadmin/config.py
+echo "SQLA_DB_NAME = '${PDNSADMIN_SQLA_DB_NAME}'" >>/opt/pdnsadmin/config.py
 
 cat >>/opt/pdnsadmin/config.py <<EOF
 SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -86,4 +82,4 @@ mysql -h${PDNSADMIN_SQLA_DB_HOST} -u${PDNSADMIN_SQLA_DB_USER} -p${PDNSADMIN_SQLA
  '${PDNS_PROTO}://${PDNS_HOST}:${PDNS_PORT}') AS tmp WHERE NOT EXISTS (SELECT name FROM setting WHERE name = 'pdns_api_url') LIMIT 1;"
 mysql -h${PDNSADMIN_SQLA_DB_HOST} -u${PDNSADMIN_SQLA_DB_USER} -p${PDNSADMIN_SQLA_DB_PASSWORD} -P${PDNSADMIN_SQLA_DB_PORT} ${PDNSADMIN_SQLA_DB_NAME} -e "INSERT INTO setting (name, value) SELECT * FROM (SELECT 'pdns_api_key',
  '${PDNS_API_KEY}') AS tmp WHERE NOT EXISTS (SELECT name FROM setting WHERE name = 'pdns_api_key') LIMIT 1;"
-/usr/bin/gunicorn -t 120 --workers 4 --bind '0.0.0.0:$PDNSADMIN_PORT' --log-level info app:app
+/usr/bin/gunicorn -t 120 --workers 4 --bind "0.0.0.0:${PDNSADMIN_PORT}" --log-level info app:app
