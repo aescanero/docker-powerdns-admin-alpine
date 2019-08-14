@@ -9,11 +9,11 @@ DB_MIGRATION_DIR='/opt/pdnsadmin/migrations'
 [ -z ${PDNS_HOST} ] && PDNS_HOST="127.0.0.1"
 [ -z ${PDNSADMIN_SQLA_DB_PORT} ] && PDNSADMIN_SQLA_DB_PORT=3306
 [ -z ${PDNSADMIN_PORT} ] && PDNSADMIN_PORT=9191
-[ -z ${PDNSADMIN_SECRET_KEY} ] && PDNSADMIN_SECRET_KEY = 'secret'
-[ -z ${PDNSADMIN_SQLA_DB_USER} ] && PDNSADMIN_SQLA_DB_USER = 'powerdns'
-[ -z ${PDNSADMIN_SQLA_DB_PASSWORD} ] && PDNSADMIN_SQLA_DB_PASSWORD = 'secret'
-[ -z ${PDNSADMIN_SQLA_DB_HOST} ] && PDNSADMIN_SQLA_DB_HOST = '127.0.0.1'
-[ -z ${PDNSADMIN_SQLA_DB_NAME} ] && PDNSADMIN_SQLA_DB_NAME = 'powerdns'
+[ -z ${PDNSADMIN_SECRET_KEY} ] && PDNSADMIN_SECRET_KEY='secret'
+[ -z ${PDNSADMIN_SQLA_DB_USER} ] && PDNSADMIN_SQLA_DB_USER='powerdns'
+[ -z ${PDNSADMIN_SQLA_DB_PASSWORD} ] && PDNSADMIN_SQLA_DB_PASSWORD='secret'
+[ -z ${PDNSADMIN_SQLA_DB_HOST} ] && PDNSADMIN_SQLA_DB_HOST='127.0.0.1'
+[ -z ${PDNSADMIN_SQLA_DB_NAME} ] && PDNSADMIN_SQLA_DB_NAME='powerdns'
 
 
 # Wait for us to be able to connect to MySQL before proceeding
@@ -60,7 +60,7 @@ SQLALCHEMY_DATABASE_URI = 'mysql://'+SQLA_DB_USER+':'+SQLA_DB_PASSWORD+'@'+SQLA_
 EOF
 
 cd /opt/pdnsadmin
-virtualenv flask
+virtualenv --system-site-packages --no-setuptools --no-pip flask
 source ./flask/bin/activate
 
 echo "===> DB management"
