@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+import getopt
+import sys
+import MySQLdb
+
+version = '1.0'
+
+username='powerdns'
+password='password'
+port=3306
+database='powerdns'
+host='127.0.0.1'
+execute='SELECT 1;'
+
+#print ('ARGV      :', sys.argv[1:])
+
+options, remainder = getopt.getopt(sys.argv[1:], 'h:u:p:P:e', ['h=',
+                                                         'u=', 
+                                                         'p=',
+                                                         'P=',
+                                                         'e=',
+                                                         ])
+for opt, arg in options:
+    if opt in ('-u', '--user'):
+        username = arg
+    elif opt in ('-p', '--password'):
+        password = arg
+    elif opt in ('-h', '--host'):
+        host = arg
+    elif opt in ('-P', '--port'):
+        port = arg
+    elif opt in ('-e', '--execute'):
+        execute = arg
+    elif opt == '--version':
+        version = arg
+
+#print ('OPTIONS   :', options)
+#print ('REMAINING :', remainder)
+
+try:
+  database=remainder[0]
+  db = MySQLdb.connect(host=host,port=int(port),user=username,passwd=password,db=database)
+  if len(remainder)>1 and execute=='':
+    cursor = db.cursor()
+    cursor.execute(remainder[2])
+  else:
+    cursor = db.cursor()
+    cursor.execute(execute)
+except NameError:
+  print ("Incorrect arguments")
+except MySQLdb.Error as e:
+  print ("Connection problem")
+else:
+  print ("Connection ok")
