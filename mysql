@@ -15,11 +15,11 @@ execute='SELECT 1;'
 #print ('ARGV      :', sys.argv[1:])
 
 options, remainder = getopt.getopt(sys.argv[1:], 'h:u:p:P:e', ['h=',
-                                                         'u=', 
-                                                         'p=',
-                                                         'P=',
-                                                         'e=',
-                                                         ])
+                                                               'u=', 
+                                                               'p=',
+                                                               'P=',
+                                                               'e=',
+                                                              ])
 for opt, arg in options:
     if opt in ('-u', '--user'):
         username = arg
@@ -40,15 +40,18 @@ for opt, arg in options:
 try:
   database=remainder[0]
   db = MySQLdb.connect(host=host,port=int(port),user=username,passwd=password,db=database)
-  if len(remainder)>1 and execute=='':
-    cursor = db.cursor()
-    cursor.execute(remainder[2])
+  cursor = db.cursor()
+  if len(remainder)>1:
+    if remainder[1]=="-e":
+      cursor.execute(remainder[2])
   else:
-    cursor = db.cursor()
     cursor.execute(execute)
+
+  db.commit()
+  db.close()
 except NameError:
   print ("Incorrect arguments")
 except MySQLdb.Error as e:
-  print ("Connection problem")
+  print ("Connection problem", e)
 else:
   print ("Connection ok")
