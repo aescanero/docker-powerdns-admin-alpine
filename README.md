@@ -115,7 +115,7 @@ spec:
           name: powerdns-api
           protocol: TCP
       - name: powerdns-admin
-        image: aescanero/docker-powerdns-admin-alpine
+        image: aescanero/powerdns-admin
         env:
         - name: PDNS_API_KEY
           valueFrom:
@@ -232,7 +232,7 @@ services:
       - mysql
 
   powerdns-admin:
-    image: aescanero/docker-powerdns-admin-alpine
+    image: aescanero/powerdns-admin
     ports:
       - "9191:9191"
     environment:
