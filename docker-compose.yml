@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 
 services:
   powerdns:
@@ -19,7 +19,7 @@ services:
       PDNS_soa_minimum_ttl: "1200"
       PDNS_default_soa_name: "ns1.${DOMAIN}"
       PDNS_default_soa_mail: "hostmaster.${DOMAIN}"
-      MYSQL_ENV_MYSQL_HOST: "127.0.0.1"
+      MYSQL_ENV_MYSQL_HOST: "mysql"
       MYSQL_ENV_MYSQL_PASSWORD: "${DB_USER_PASSWORD}"
       MYSQL_ENV_MYSQL_DATABASE: "${DB_NAME}"
       MYSQL_ENV_MYSQL_USER: "${DB_USERNAME}"
@@ -30,16 +30,16 @@ services:
       - mysql
 
   powerdns-admin:
-    image: aescanero/docker-powerdns-admin-alpine
+    image: aescanero/powerdns-admin
     ports:
       - "9191:9191"
     environment:
       PDNS_PROTO: "http"
       PDNS_API_KEY: "${PDNS_API_KEY}"
-      PDNS_HOST: "127.0.0.1"
+      PDNS_HOST: "powerdns"
       PDNS_PORT: "8081"
       PDNSADMIN_SECRET_KEY: "secret"
-      PDNSADMIN_SQLA_DB_HOST: "127.0.0.1"
+      PDNSADMIN_SQLA_DB_HOST: "mysql"
       PDNSADMIN_SQLA_DB_PASSWORD: "${DB_USER_PASSWORD}"
       PDNSADMIN_SQLA_DB_NAME: "${DB_NAME}"
       PDNSADMIN_SQLA_DB_USER: "${DB_USERNAME}"
