@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.2'
 
 services:
   powerdns:
@@ -57,5 +57,7 @@ services:
       MYSQL_DATABASE: "${DB_NAME}"
       MYSQL_USER: "${DB_USERNAME}"
       MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+    volumes:
+    - ${LOCALPATH}:/var/lib/mysql
     ports:
       - "3306:3306"
