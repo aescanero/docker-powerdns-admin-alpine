@@ -7,6 +7,37 @@ This image only runs with a Mysql database (see examples)
 
 There are some enviroment variables needed to run the container:
 
+* PDNS_API_KEY: Access key to PowerDNS API (needed)
+* DOMAIN: Domain to manage (needed)
+* LOCALPATH: Path in the host machine where the database is stored (needed)
+* DB_NAME: Database to use in the MySql Server for PowerDNS (needed)
+* DB_USERNAME: User with access to manage the MySql Database (needed)
+* DB_USER_PASSWORD: Password of the MySql user (needed)
+* DB_ROOT_PASSWORD: Password of the MySql user (needed)
+
+## How to test this container with Docker Composer:
+
+```
+$ mkdir ~/mysql
+$ git clone https://github.com/aescanero/docker-powerdns-admin-alpine
+$ cd docker-powerdns-admin-alpine
+$ LOCALPATH="~/mysql" DOMAIN="disasterproject.com" DB_USERNAME="powerdns" DB_USER_PASSWORD="password" DB_ROOT_PASSWORD="password" DB_NAME="powerdns" PDNS_API_KEY="random" docker-compose up -d
+$ docker-compose ps
+```
+And then open http://WHERE_IS_RUNNING_DOCKER:9191 to access PowerDNS-Admin
+To remove:
+
+```
+$ cd ~/docker-powerdns-admin-alpine
+$ docker-compose stop
+$ docker-compose rm
+```
+Database is in ~/mysql, you must remove it if you don't use it again.
+
+## YAML For Kubernetes deployment, (using a loadBalancer service):
+
+There are some enviroment variables needed to run the container:
+
 * PDNS_PROTO: (http|https) protocol of PowerDNS API (Default http)
 * PDNS_PORT: Port of PowerDNS API REST (Default 8081)
 * PDNS_HOST: IP or name of the PowerDNS Server (Default: 127.0.0.1)
@@ -18,19 +49,6 @@ There are some enviroment variables needed to run the container:
 * PDNSADMIN_SQLA_DB_USER: User with access to manage the MySql Database (Default: powerdns)
 * PDNSADMIN_SQLA_DB_PASSWORD: Password of the MySql user (Default: secret)
 * PDNSADMIN_SQLA_DB_HOST: IP or name of the MySql Server (Default: 127.0.0.1)
-
-## How to test this container with Docker Composer:
-
-```
-$ git clone https://github.com/aescanero/docker-powerdns-admin-alpine
-$ cd docker-powerdns-admin-alpine
-$ DOMAIN="disasterproject.com" DB_USERNAME="powerdns" DB_USER_PASSWORD="password" DB_ROOT_PASSWORD="password" DB_NAME="powerdns" PDNS_API_KEY="random" docker-compose up -d
-```
-
-And then open http://WHERE_IS_RUNNING_DOCKER:9191 to access PowerDNS-Admin
-
-
-## YAML For Kubernetes deployment, (using a loadBalancer service):
 
 ```
 ---
