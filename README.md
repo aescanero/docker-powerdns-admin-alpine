@@ -1,10 +1,11 @@
 # docker-powerdns-admin
 
+[PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) provides a dashboard for PowerDNS management.
 [PowerDNS](https://www.powerdns.com/) is an open source DNS Authoritative Server (answer questions about domains it knows about, but will not go out on the net to resolve queries about other domains) software.
 
-This also packages:
+The examples also packages:
 
-- [aescanero/docker-powerdns-admin-alpine](https://github.com/aescanero/docker-powerdns-admin-alpine) based in [ngoduykhanh/PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) which provide a dashboard for PowerDNS management.
+- [aescanero/docker-powerdns-admin-alpine](https://github.com/aescanero/docker-powerdns-admin-alpine) based in [ngoduykhanh/PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) which provides a dashboard for PowerDNS management.
 - [yobasystems/alpine-mariadb](https://github.com/yobasystems/alpine-mariadb) which is required for bootstrapping a MariaDB deployment for the database requirements of the PowerDNS and PowerDNS-Admin applications.
 
 ## Docker image for powerdns-admin to manage powerdns
