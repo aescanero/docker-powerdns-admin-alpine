@@ -8,16 +8,16 @@ RUN mkdir /xmlsec && curl -sSL https://github.com/mehcode/python-xmlsec/archive/
   && cd /xmlsec && pip3 install --no-cache-dir .
 
 RUN mkdir -p /opt/pdnsadmin/ && cd /opt/pdnsadmin \
-  && curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/pdnsadmin --strip 1 \
+  && curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/v0.2.2.tar.gz | tar -xzC /opt/pdnsadmin --strip 1 \
   && sed -i -e '/mysqlclient/d' -e '/pyOpenSSL/d' -e '/python-ldap/d' requirements.txt \
   && virtualenv --system-site-packages --no-setuptools --no-pip flask && source ./flask/bin/activate \
   && pip3 install --no-cache-dir -r requirements.txt
 
 RUN cd /opt/pdnsadmin \
-  && cp config_template.py config.py \
+  && cat configs/development.py >config.py \
   && yarn install --pure-lockfile && yarn cache clean \
-  && virtualenv --system-site-packages --no-setuptools --no-pip flask && source ./flask/bin/activate && flask assets build \
-  && cd app/static && tar -cf t.tar `cat ../assets.py |grep node|cut -d\' -f 2|tr '\n' ' '` \
+  && virtualenv --system-site-packages --no-setuptools --no-pip flask && . ./flask/bin/activate && FLASK_APP=/opt/pdnsadmin/powerdnsadmin/__init__.py flask assets build \
+  && cd powerdnsadmin/static/ && tar -cf t.tar `cat ../assets.py |grep node|cut -d\' -f 2|tr '\n' ' '` \
   && cd node_modules && find . -maxdepth 1 -type d ! -name "icheck" ! -name "bootstrap" ! -name "font-awesome" ! -name "ionicons" ! -name "multiselect" ! -name "." -exec rm -rf {} ";" \
   && cd .. && tar -xf t.tar && rm -f t.tar
 
