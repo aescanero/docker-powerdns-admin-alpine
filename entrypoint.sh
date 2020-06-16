@@ -60,6 +60,7 @@ SQLALCHEMY_DATABASE_URI = 'mysql://'+SQLA_DB_USER+':'+SQLA_DB_PASSWORD+'@'+SQLA_
 EOF
 
 cd /opt/pdnsadmin
+FLASK_APP=/opt/pdnsadmin/powerdnsadmin/__init__.py
 virtualenv --system-site-packages --no-setuptools --no-pip flask
 source ./flask/bin/activate
 

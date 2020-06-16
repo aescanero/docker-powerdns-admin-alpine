@@ -27,9 +27,9 @@ There are some enviroment variables needed to run the container:
 ## How to test this container with Docker Composer:
 
 ```
-$ mkdir ~/mysql
 $ git clone https://github.com/aescanero/docker-powerdns-admin-alpine
 $ cd docker-powerdns-admin-alpine
+$ mkdir ~/mysql
 $ LOCALPATH="~/mysql" DOMAIN="disasterproject.com" DB_USERNAME="powerdns" DB_USER_PASSWORD="password" DB_ROOT_PASSWORD="password" DB_NAME="powerdns" PDNS_API_KEY="random" docker-compose up -d
 $ docker-compose ps
 ```
