@@ -51,7 +51,10 @@ try:
   db.close()
 except NameError:
   print ("Incorrect arguments")
+  sys.exit(1)
 except MySQLdb.Error as e:
   print ("Connection problem", e)
+  sys.exit(1)
 else:
   print ("Connection ok")
+  sys.exit(0)
