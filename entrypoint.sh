@@ -3,9 +3,10 @@
 #Based in work from Khanh Ngo "k@ndk.name" (https://github.com/ngoduykhanh/PowerDNS-Admin/blob/master/docker/PowerDNS-Admin/Dockerfile)
 
 export PATH=$PATH:/opt/.local/bin
-export DB_MIGRATION_DIR='/opt/pdnsadmin/migrations'
 export PYTHONPATH=/opt/.local/lib/python3.8/site-packages/
 export FLASK_CONF=/opt/pdnsadmin/config.py
+export DB_MIGRATION_DIR_INIT='/opt/pdnsadmin/migrations.init'
+export DB_MIGRATION_DIR_UPDATE='/opt/pdnsadmin/migrations.update'
 
 [ -z ${PDNS_PROTO} ] && export PDNS_PROTO="http"
 [ -z ${PDNS_PORT} ] && export PDNS_PORT=8081
@@ -27,22 +28,14 @@ do
   sleep 5
 done
 
-#cd /opt/pdnsadmin
-#virtualenv --system-site-packages --no-setuptools --no-pip powerdnsadmin
-#source ./powerdnsadmin/bin/activate
-#export FLASK_APP=/opt/pdnsadmin/powerdnsadmin/__init__.py
-
-echo "===> DB management"
-if [ ! -d "${DB_MIGRATION_DIR}" ]; then
-  echo "---> Running DB Init"
-  flask db init --directory ${DB_MIGRATION_DIR}
-  flask db migrate -m "Init DB" --directory ${DB_MIGRATION_DIR}
-  flask db upgrade --directory ${DB_MIGRATION_DIR}
-#  ./init_data.py
+if mysql -h${PDNSADMIN_SQLA_DB_HOST} -u${PDNSADMIN_SQLA_DB_USER} -p${PDNSADMIN_SQLA_DB_PASSWORD} -P${PDNSADMIN_SQLA_DB_PORT} ${PDNSADMIN_SQLA_DB_NAME} -e "DESCRIBE domain_template_record;" 2>&1 \
+  |grep "Table 'powerdns.domain_template_record' doesn't exist" >/dev/null
+then
+# INIT DB
+  flask db upgrade --directory "/opt/pdnsadmin/migrations.init"
 else
-  echo "---> Running DB Migration"
-  flask db migrate -m "Upgrade DB Schema" --directory ${DB_MIGRATION_DIR}
-  flask db upgrade --directory ${DB_MIGRATION_DIR}
+# UPDATE DB if needed
+  flask db upgrade --directory "/opt/pdnsadmin/migrations.update"
 fi
 
 echo "===> Update PDNS API connection info"
@@ -54,5 +47,9 @@ mysql -h${PDNSADMIN_SQLA_DB_HOST} -u${PDNSADMIN_SQLA_DB_USER} -p${PDNSADMIN_SQLA
 [ ! -z ${DOMAIN} ] && mysql -h${PDNSADMIN_SQLA_DB_HOST} -u${PDNSADMIN_SQLA_DB_USER} -p${PDNSADMIN_SQLA_DB_PASSWORD} -P${PDNSADMIN_SQLA_DB_PORT} ${PDNSADMIN_SQLA_DB_NAME} -e "INSERT INTO domains (name, master, type, account)
   SELECT * FROM (SELECT '${DOMAIN}','','NATIVE','') AS tmp WHERE NOT EXISTS (SELECT name FROM domains WHERE name = '${DOMAIN}') LIMIT 1;"
 
-[ $(id -u) -eq 0 ] && su -s /bin/sh pda -c "gunicorn -t 120 --workers 4 --bind '0.0.0.0:${PDNSADMIN_PORT}' --log-level info 'powerdnsadmin:create_app()'" \
-  || gunicorn -t 120 --workers 4 --bind '0.0.0.0:${PDNSADMIN_PORT}' --log-level info 'powerdnsadmin:create_app()'
+if [ $(id -u) -eq 0 ] 
+then
+  su -s /bin/sh pda -c "gunicorn -t 120 --workers 4 --bind '0.0.0.0:${PDNSADMIN_PORT}' --log-level info 'powerdnsadmin:create_app()'"
+else
+  gunicorn -t 120 --workers 4 --bind '0.0.0.0:${PDNSADMIN_PORT}' --log-level info 'powerdnsadmin:create_app()'
+fi
