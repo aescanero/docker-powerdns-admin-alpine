@@ -6,12 +6,13 @@ RUN apk add --no-cache curl python3 mariadb-connector-c py3-lxml libldap yarn li
   && apk add --no-cache --virtual build-dependencies mariadb-connector-c-dev xmlsec-dev gcc python3-dev musl-dev libffi-dev libressl-dev libxslt-dev libxml2-dev openldap-dev
 
 RUN mkdir -p /opt/pdnsadmin/ && cd /opt/pdnsadmin \
-  && curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/v0.2.2.tar.gz | tar -xzC /opt/pdnsadmin --strip 1 \
+  && curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/ab7e1eb71be39c8206f15120cd987883fb846280.tar.gz | tar -xzC /opt/pdnsadmin --strip 1 \
   && PATH=$PATH:~/.local/bin pip3 install --no-cache-dir --user -r requirements.txt
 
 RUN cd /opt/pdnsadmin \
   && cat configs/development.py >config.py \
   && yarn install --pure-lockfile && yarn cache clean \
+  && cp -r migrations migrations.init && mv migrations migrations.update && rm -f migrations.init/versions/*.py \
   && sed -i -r -e "s|'cssmin',\s?'cssrewrite'|'cssmin'|g" powerdnsadmin/assets.py \
   && PATH=$PATH:~/.local/bin FLASK_APP=/opt/pdnsadmin/powerdnsadmin/__init__.py flask assets build \
   && mv powerdnsadmin/static /tmp/static && mkdir powerdnsadmin/static \
@@ -74,6 +75,7 @@ SQLALCHEMY_DATABASE_URI = 'mysql://'+SQLA_DB_USER+':'+SQLA_DB_PASSWORD+'@'+SQLA_
 
 ADD entrypoint.sh /entrypoint.sh
 ADD mysql /usr/bin/mysql
+ADD 3f76448bb6de_init_db.py /opt/pdnsadmin/migrations.init/versions
 RUN chmod 0755 /entrypoint.sh && chmod 0755 /usr/bin/mysql && chmod -fR 755 /opt/.local
 
 WORKDIR /opt/pdnsadmin
