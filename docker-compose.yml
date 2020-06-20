@@ -51,8 +51,8 @@ services:
       - powerdns
 
   mysql:
-    image: mysql
-    command: --net-read-timeout=600 --innodb_use_native_aio=0 --innodb_flush_method=fsync
+    image: mariadb
+    command: --net-read-timeout=2000 --innodb_use_native_aio=0 --innodb_flush_method=fsync
     environment:
       MYSQL_PASSWORD: "${DB_USER_PASSWORD}"
       MYSQL_DATABASE: "${DB_NAME}"
